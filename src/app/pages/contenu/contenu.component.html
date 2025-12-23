@@ -1,0 +1,49 @@
+<main id="main-content" role="main" class="max-w-4xl mx-auto px-6 py-8" *ngIf="contenu">
+  <nav aria-label="Actions du contenu" class="mb-8">
+    <div class="flex flex-col gap-4">
+      <a routerLink="/catalogue" class="button">Revenir à la liste des témoignages</a>
+    </div>
+  </nav>
+
+  <div role="status" aria-live="polite" aria-atomic="true" class="sr-only" id="audio-status"></div>
+
+  <article aria-labelledby="content-title">
+    <h2 id="content-title" class="text-3xl font-bold text-white mb-8">{{ contenu.titre }}</h2>
+
+    <section *ngIf="contenu.audioDisponible" aria-label="Contrôles audio" class="audio-controls">
+      <h3 class="text-xl font-bold text-white">Version audio</h3>
+
+      <div class="flex flex-col gap-4">
+        <button type="button" (click)="play()" [disabled]="isPlaying && !isPaused" class="button">
+          {{ isPlaying && !isPaused ? 'Lecture en cours...' : (isPaused ? 'Reprendre la lecture' : 'Démarrer la lecture audio') }}
+        </button>
+
+        <button type="button" (click)="pause()" [disabled]="!isPlaying || isPaused" class="button">
+          Mettre en pause
+        </button>
+
+        <button type="button" (click)="stop()" [disabled]="!isPlaying" class="button">
+          Arrêter la lecture
+        </button>
+      </div>
+
+      <p class="text-lg">Durée totale: {{ contenu.dureeMinutes }}</p>
+      <p class="text-lg">Position: {{ formatTime(currentTime) }} / {{ contenu.duree }}</p>
+    </section>
+
+    <section aria-labelledby="text-title" class="mt-12">
+      <h3 id="text-title" class="text-2xl font-bold text-white mb-6">Texte intégral</h3>
+
+      <div class="space-y-6">
+        <p *ngFor="let paragraphe of contenu.texte" class="text-xl leading-relaxed">{{ paragraphe }}</p>
+      </div>
+    </section>
+  </article>
+
+  <nav aria-label="Navigation" class="mt-12">
+    <div class="flex flex-col gap-4">
+      <a routerLink="/catalogue" class="button">Revenir à la liste des témoignages</a>
+      <a routerLink="/" class="button-secondary button">Retour à l'accueil</a>
+    </div>
+  </nav>
+</main>

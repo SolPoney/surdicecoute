@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* === Styles d'accessibilité RGAA strict === */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  font-size: 18px;
+  line-height: 1.6;
+  color: #f3f4f6;
+  background-color: #030712;
+}
+
+/* Lien d'évitement (skip link) */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #fbbf24;
+  color: #000;
+  padding: 12px 24px;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 18px;
+  z-index: 1000;
+}
+
+.skip-link:focus {
+  top: 0;
+  outline: 3px solid #fbbf24;
+  outline-offset: 3px;
+}
+
+/* Focus visible obligatoire */
+*:focus {
+  outline: 3px solid #fbbf24;
+  outline-offset: 3px;
+}
+
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: 3px solid #fbbf24;
+  outline-offset: 3px;
+}
+
+/* Pas d'animations perturbantes */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Formulaires accessibles */
+.form-label {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #f3f4f6;
+  margin-bottom: 0.5rem;
+}
+
+.form-label-inline {
+  font-size: 1.25rem;
+  color: #f3f4f6;
+  margin-left: 0.75rem;
+  cursor: pointer;
+}
+
+.form-input {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  color: #f3f4f6;
+  background-color: #1f2937;
+  border: 2px solid #4b5563;
+  border-radius: 0.5rem;
+}
+
+.form-input:focus {
+  border-color: #fbbf24;
+  background-color: #111827;
+}
+
+.form-input:disabled {
+  background-color: #374151;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.form-radio {
+  width: 1.5rem;
+  height: 1.5rem;
+  cursor: pointer;
+}
+
+textarea.form-input {
+  resize: vertical;
+  min-height: 120px;
+}
+
+/* Messages de feedback */
+.success-message {
+  padding: 1.5rem;
+  background-color: #065f46;
+  border: 2px solid #10b981;
+  border-radius: 0.5rem;
+  margin-bottom: 2rem;
+  color: #d1fae5;
+}
+
+.error-message {
+  padding: 1.5rem;
+  background-color: #7f1d1d;
+  border: 2px solid #ef4444;
+  border-radius: 0.5rem;
+  margin-bottom: 2rem;
+  color: #fecaca;
+}

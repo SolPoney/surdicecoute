@@ -1,0 +1,320 @@
+<main id="main-content" role="main" class="max-w-7xl mx-auto px-6 py-8">
+  <!-- En-tête avec déconnexion -->
+  <div
+    class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8"
+  >
+    <div>
+      <h2 class="text-3xl font-bold text-white">Tableau de bord</h2>
+      <p class="text-lg text-gray-300 mt-1" *ngIf="ecoutantConnecte">
+        Bienvenue, {{ ecoutantConnecte.prenom }} {{ ecoutantConnecte.nom }}
+      </p>
+    </div>
+    <div class="flex gap-3" *ngIf="ecoutantConnecte">
+      <button
+        type="button"
+        (click)="toggleDisponibilite()"
+        [class]="
+          ecoutantConnecte.disponible
+            ? 'bg-green-600 hover:bg-green-700'
+            : 'bg-gray-600 hover:bg-gray-700'
+        "
+        class="px-6 py-3 rounded-lg text-white font-semibold transition-colors flex items-center gap-2"
+        [attr.aria-pressed]="ecoutantConnecte.disponible"
+      >
+        <span *ngIf="ecoutantConnecte.disponible">✓</span>
+        <span *ngIf="!ecoutantConnecte.disponible">✗</span>
+        {{ ecoutantConnecte.disponible ? "Disponible" : "Indisponible" }}
+      </button>
+      <button
+        type="button"
+        (click)="deconnexion()"
+        class="px-6 py-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold transition-colors"
+      >
+        Déconnexion
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="!ecoutantConnecte" role="alert" class="error-message">
+    <p class="text-xl">
+      Vous devez être connecté en tant qu'écoutant pour accéder à cette page.
+    </p>
+    <a routerLink="/" class="button mt-4">Retour à l'accueil</a>
+  </div>
+
+  <div *ngIf="ecoutantConnecte">
+    <!-- Message de feedback -->
+    <div
+      *ngIf="messageAction"
+      role="alert"
+      aria-live="polite"
+      [class]="messageType === 'success' ? 'success-message' : 'error-message'"
+    >
+      {{ messageAction }}
+    </div>
+
+    <!-- Statistiques en cartes -->
+    <section aria-labelledby="stats-title" class="mb-10">
+      <h3 id="stats-title" class="text-2xl font-bold text-white mb-6">
+        Vue d'ensemble
+      </h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div
+          class="bg-gradient-to-br from-yellow-600 to-yellow-700 p-6 rounded-xl shadow-lg"
+        >
+          <div class="flex items-center justify-between mb-2">
+            <p class="text-yellow-100 text-lg font-medium">En attente</p>
+            <span class="text-3xl">⏳</span>
+          </div>
+          <p class="text-5xl font-bold text-white mb-1">
+            {{ statistiques.demandesEnAttente || 0 }}
+          </p>
+          <p class="text-yellow-100 text-sm">Nouvelles demandes</p>
+        </div>
+
+        <div
+          class="bg-gradient-to-br from-blue-600 to-blue-700 p-6 rounded-xl shadow-lg"
+        >
+          <div class="flex items-center justify-between mb-2">
+            <p class="text-blue-100 text-lg font-medium">En cours</p>
+            <span class="text-3xl">🔄</span>
+          </div>
+          <p class="text-5xl font-bold text-white mb-1">
+            {{ statistiques.demandesEnCours || 0 }}
+          </p>
+          <p class="text-blue-100 text-sm">Prises en charge</p>
+        </div>
+
+        <div
+          class="bg-gradient-to-br from-green-600 to-green-700 p-6 rounded-xl shadow-lg"
+        >
+          <div class="flex items-center justify-between mb-2">
+            <p class="text-green-100 text-lg font-medium">Écoutants</p>
+            <span class="text-3xl">👥</span>
+          </div>
+          <p class="text-5xl font-bold text-white mb-1">
+            {{ statistiques.ecoutantsDisponibles || 0 }}
+          </p>
+          <p class="text-green-100 text-sm">Disponibles</p>
+        </div>
+
+        <div
+          class="bg-gradient-to-br from-purple-600 to-purple-700 p-6 rounded-xl shadow-lg"
+        >
+          <div class="flex items-center justify-between mb-2">
+            <p class="text-purple-100 text-lg font-medium">Mes demandes</p>
+            <span class="text-3xl">📋</span>
+          </div>
+          <p class="text-5xl font-bold text-white mb-1">
+            {{ ecoutantConnecte.nombreDemandesEnCours || 0 }}
+          </p>
+          <p class="text-purple-100 text-sm">Sous ma responsabilité</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mes demandes en cours -->
+    <section aria-labelledby="my-requests-title" class="mb-10">
+      <div class="flex items-center justify-between mb-6">
+        <h3 id="my-requests-title" class="text-2xl font-bold text-white">
+          Mes demandes en cours
+          <span class="ml-3 px-3 py-1 bg-blue-600 rounded-full text-lg">
+            {{ mesDemandesEnCours.length }}
+          </span>
+        </h3>
+      </div>
+
+      <div
+        *ngIf="mesDemandesEnCours.length === 0"
+        class="content-card text-center py-12"
+      >
+        <span class="text-6xl mb-4 block">📭</span>
+        <p class="text-xl text-gray-300">
+          Vous n'avez actuellement aucune demande en cours.
+        </p>
+        <p class="text-base text-gray-400 mt-2">
+          Les demandes que vous prendrez en charge apparaîtront ici.
+        </p>
+      </div>
+
+      <div *ngIf="mesDemandesEnCours.length > 0" class="space-y-4">
+        <article
+          *ngFor="let demande of mesDemandesEnCours"
+          class="bg-gray-800 border-l-4 border-blue-500 rounded-lg p-6 hover:bg-gray-750 transition-colors"
+        >
+          <div
+            class="flex flex-col md:flex-row justify-between items-start gap-4 mb-4"
+          >
+            <div class="flex-1">
+              <h4
+                class="text-2xl font-bold text-white mb-2 flex items-center gap-3"
+              >
+                {{ demande.sujet }}
+                <span
+                  [class]="
+                    'px-3 py-1 rounded-full text-sm font-semibold ' +
+                    getUrgenceClass(demande.urgence)
+                  "
+                  role="status"
+                >
+                  {{ getUrgenceLabel(demande.urgence) }}
+                </span>
+              </h4>
+              <p class="text-lg text-gray-300 mb-2">
+                👤 {{ demande.prenom }} {{ demande.nom }}
+              </p>
+              <p class="text-base text-gray-400">
+                🕒 Demandé le {{ formatDate(demande.dateCreation) }}
+              </p>
+            </div>
+          </div>
+
+          <div class="bg-gray-900 p-4 rounded-lg mb-4">
+            <p class="text-base font-semibold text-gray-300 mb-2">
+              💬 Message :
+            </p>
+            <p class="text-lg leading-relaxed text-gray-100">
+              {{ demande.message }}
+            </p>
+          </div>
+
+          <div
+            class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+          >
+            <div class="text-base text-gray-300">
+              <strong>📞 Contact :</strong>
+              <span *ngIf="demande.modeContact === 'email'" class="ml-2">
+                ✉️ {{ demande.email }}
+              </span>
+              <span *ngIf="demande.modeContact === 'telephone'" class="ml-2">
+                📱 {{ demande.telephone }}
+              </span>
+              <span *ngIf="demande.modeContact === 'messagerie'" class="ml-2">
+                💬 Messagerie sécurisée
+              </span>
+            </div>
+
+            <button
+              type="button"
+              (click)="terminerDemande(demande.id)"
+              class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors"
+            >
+              > ✅ Marquer comme terminée
+            </button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Nouvelles demandes en attente -->
+    <section aria-labelledby="waiting-requests-title">
+      <div class="flex items-center justify-between mb-6">
+        <h3 id="waiting-requests-title" class="text-2xl font-bold text-white">
+          Nouvelles demandes
+          <span class="ml-3 px-3 py-1 bg-yellow-600 rounded-full text-lg">
+            {{ demandesEnAttente.length }}
+          </span>
+        </h3>
+      </div>
+
+      <div
+        *ngIf="demandesEnAttente.length === 0"
+        class="content-card text-center py-12"
+      >
+        <span class="text-6xl mb-4 block">✅</span>
+        <p class="text-xl text-gray-300">
+          Aucune nouvelle demande en attente pour le moment.
+        </p>
+        <p class="text-base text-gray-400 mt-2">
+          Revenez plus tard ou vérifiez vos demandes en cours.
+        </p>
+      </div>
+
+      <div *ngIf="demandesEnAttente.length > 0" class="space-y-4">
+        <article
+          *ngFor="let demande of demandesEnAttente"
+          class="bg-gray-800 border-l-4 border-yellow-500 rounded-lg p-6 hover:bg-gray-750 transition-colors"
+        >
+          <div
+            class="flex flex-col md:flex-row justify-between items-start gap-4 mb-4"
+          >
+            <div class="flex-1">
+              <h4
+                class="text-2xl font-bold text-white mb-2 flex items-center gap-3"
+              >
+                {{ demande.sujet }}
+                <span
+                  [class]="
+                    'px-3 py-1 rounded-full text-sm font-semibold ' +
+                    getUrgenceClass(demande.urgence)
+                  "
+                  role="status"
+                >
+                  {{ getUrgenceLabel(demande.urgence) }}
+                </span>
+              </h4>
+              <p class="text-lg text-gray-300 mb-2">
+                👤 {{ demande.prenom }} {{ demande.nom }}
+              </p>
+              <p class="text-base text-gray-400">
+                🕒 Demandé le {{ formatDate(demande.dateCreation) }}
+              </p>
+            </div>
+          </div>
+
+          <div class="bg-gray-900 p-4 rounded-lg mb-4">
+            <p class="text-base font-semibold text-gray-300 mb-2">
+              💬 Message :
+            </p>
+            <p class="text-lg leading-relaxed text-gray-100">
+              {{ demande.message }}
+            </p>
+          </div>
+
+          <div
+            class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+          >
+            <div class="text-base text-gray-300">
+              <strong>📞 Contact préféré :</strong>
+              <span *ngIf="demande.modeContact === 'email'" class="ml-2"
+                >✉️ Email</span
+              >
+              <span *ngIf="demande.modeContact === 'telephone'" class="ml-2"
+                >📱 Téléphone</span
+              >
+              <span *ngIf="demande.modeContact === 'messagerie'" class="ml-2"
+                >💬 Messagerie</span
+              >
+            </div>
+
+            <button
+              type="button"
+              (click)="prendreEnCharge(demande.id)"
+              [disabled]="!ecoutantConnecte.disponible"
+              [class]="
+                ecoutantConnecte.disponible
+                  ? 'px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors'
+                  : 'px-6 py-3 bg-gray-600 text-gray-400 font-semibold rounded-lg cursor-not-allowed'
+              "
+            >
+              📝 Prendre en charge
+            </button>
+          </div>
+
+          <p
+            *ngIf="!ecoutantConnecte.disponible"
+            class="text-sm text-yellow-400 mt-3"
+          >
+            Vous devez être disponible pour prendre en charge de nouvelles
+            demandes
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <div class="mt-12">
+      <a routerLink="/" class="button-secondary button">Retour à l'accueil</a>
+    </div>
+  </div>
+</main>

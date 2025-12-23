@@ -1,0 +1,98 @@
+<main id="main-content" role="main" class="max-w-2xl mx-auto px-6 py-8">
+  <h2 class="text-2xl font-bold text-white mb-8">Connexion espace écoutant</h2>
+
+  <div class="content-card">
+    <form (ngSubmit)="onSubmit()" class="space-y-6">
+      <div
+        role="alert"
+        aria-live="polite"
+        aria-atomic="true"
+        class="sr-only"
+        id="form-status"
+      >
+        {{ errorMessage }}
+      </div>
+
+      <div *ngIf="errorMessage" class="error-message" role="alert">
+        {{ errorMessage }}
+      </div>
+
+      <div class="p-6 bg-gray-800 rounded-lg mb-6">
+        <h3 class="text-xl font-bold text-white mb-4">
+          Comptes de test disponibles
+        </h3>
+        <ul class="space-y-2 text-lg">
+          <li>📧 marie.dupont&#64;lepharedouest.fr</li>
+          <li>🔑 password123</li>
+          <li class="mt-4">📧 pierre.martin&#64;lepharedouest.fr</li>
+          <li>🔑 password123</li>
+        </ul>
+      </div>
+
+      <div>
+        <label for="email" class="form-label">
+          Adresse email
+          <span class="text-red-400" aria-label="obligatoire">*</span>
+        </label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          [(ngModel)]="email"
+          required
+          autocomplete="email"
+          class="form-input"
+          aria-required="true"
+          [disabled]="isLoading"
+        />
+      </div>
+
+      <div>
+        <label for="password" class="form-label">
+          Mot de passe
+          <span class="text-red-400" aria-label="obligatoire">*</span>
+        </label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          [(ngModel)]="password"
+          required
+          autocomplete="current-password"
+          class="form-input"
+          aria-required="true"
+          [disabled]="isLoading"
+        />
+      </div>
+
+      <div class="flex flex-col gap-4">
+        <button
+          type="submit"
+          [disabled]="isLoading"
+          class="button"
+          [attr.aria-busy]="isLoading"
+        >
+          {{ isLoading ? "Connexion en cours..." : "Se connecter" }}
+        </button>
+
+        <a routerLink="/" class="button-secondary button">
+          Retour à l'accueil
+        </a>
+      </div>
+    </form>
+
+    <div class="mt-8 p-6 bg-gray-800 rounded-lg">
+      <h3 class="text-xl font-bold text-white mb-4">
+        Vous n'êtes pas encore écoutant ?
+      </h3>
+      <p class="text-lg leading-relaxed mb-4">
+        Pour devenir écoutant sur la plateforme Surdicécoute, contactez Le Phare
+        d'Ouest.
+      </p>
+      <p class="text-lg leading-relaxed">
+        Une formation et une validation sont requises avant de pouvoir
+        accompagner les personnes en demande d'écoute.
+      </p>
+    </div>
+  </div>
+</main>
